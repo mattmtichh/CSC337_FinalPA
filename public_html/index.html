@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Minesweeper</title>
+        <link id="cssFile" rel="stylesheet" type="text/css" href="style.css">
+        <script src="functions.js"></script>
+    </head>
+    <body>
+        <h1>Minesweeper</h1>
+        <div class="inputBlock">
+            <h1>Login</h1>
+            <div>
+                <div class="signin">
+                    <label for="existingUser">Username </label>
+                    <input id="existingUser" name="User">
+                </div>
+                <div class="signin">
+                    <label for="existingPassword">Password  </label>
+                    <input id="existingPassword" name="Password">
+                </div>
+            </div>
+            <div>
+                <button type="submit" onclick="login()">Login</button>
+            </div>
+        </div>
+        <div class="inputBlock">
+            <h1>Create Account</h1>
+            <div>
+                <div class="signin">
+                    <label for="newUser">Username </label>
+                    <input id="newUser" name="NewUser">
+                </div>
+                <div class="signin">
+                    <label for="newPassword">Password  </label>
+                    <input id="newPassword" name="NewPassword">
+                </div>
+            </div>
+            <div>
+                <button type="submit" onclick="createAccount()">Create</button>
+            </div>
+        </div>
+    </body>
+</html>

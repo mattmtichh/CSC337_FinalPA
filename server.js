@@ -97,7 +97,7 @@ app.post('/app/create/game/:user/:diff', (req, res) => {
                     if (numBombs === 0) {
                         board[i][j][0] = 'e';
                     } else {
-                        board[i][j][0] = numBombs;
+                        board[i][j][0] = String(numBombs);
                     }
                 }
             }

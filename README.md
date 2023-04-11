@@ -4,9 +4,8 @@
 
     Group: Jon Khong, Carson Chapman, Matt Mitchelson
     Project: Minesweeper variant
-
-Description:
-For this project we want to build a clone to Minesweeper. Included in this project, we want to have all of the normal functionality of Minesweeper with a few additions such as, theme changes, time trials etc. For the database we want to store the usernames and passwords of every player. In addition to user logins, we want to create a schema model for the games themselves. Game model will have elements to store such as the game boards, dimensions of the board, game status - (ongoing, win, loss), username, game time(?).
+    Description:
+	For this project we want to build a clone to Minesweeper. Included in this project, we want to have all of the normal functionality of Minesweeper with a few additions such as, theme changes, time trials etc. For the database we want to store the usernames and passwords of every player. In addition to user logins, we want to create a schema model for the games themselves. Game model will have elements to store such as the game boards, dimensions of the board, game status - (ongoing, win, loss), username, game time(?).
 
 ## Game Logic:
 

@@ -4,11 +4,11 @@ const express = require('express');
 const parser = require('body-parser')
 const fs = require('fs');
 
-// const connection_string = new string
-// mongoose.connect(connection_string, { useNewUrlParser: true });
-// mongoose.connection.on('error', () => {
-//     console.log('There was a problem connecting to mongoDB');
-// });
+const connection_string = 'mongodb+srv://csc337:csc337@minesweepercluster.nufi7ln.mongodb.net/?retryWrites=true&w=majority';
+mongoose.connect(connection_string, { useNewUrlParser: true });
+mongoose.connection.on('error', () => {
+    console.log('There was a problem connecting to mongoDB');
+});
 
 var GameSchema = new mongoose.Schema( {
     user: String,
@@ -28,10 +28,56 @@ var UserSchema = new mongoose.Schema( {
 })
 var User = mongoose.model('User', UserSchema);
 
+
+// need to change these next functions to work better for the app, just copied from PA 10
+let sessions = [];
+
+function addSession(user) {
+    let sessionID = Math.floor(Math.random() * 100000);
+    let sessionStart = Date.now();
+    sessions[user] = {'sid': sessionID, 'start': sessionStart};
+    return sessionID;
+}
+
+function doesUserHaveSession(user,sessionID) {
+    let entry = sessions[user];
+    if (entry != undefined) {
+        return entry.sid == sessionID;
+    }
+    return false;
+}
+
+const SESSION_LENGTH = 30000;
+
+function cleanUpSessions() {
+    let currentTime = Date.now();
+    for (i in sessions) {
+        let sess = sessions[i];
+        if (sess.start + SESSION_LENGTH < currentTime) {
+            console.log('ending session for '+i);
+            delete sessions[i];
+        }
+    }
+}
+
+setInterval(cleanUpSessions, 2000);
+
+function authenticate(req,res,next) {
+    let c = req.cookies;
+    if (c && c.login) {
+        let result = doesUserHaveSession(c.login.username,c.login.sid);
+        if (result) {
+            next();
+            return;
+        }
+    }
+    res.redirect('/index.html');
+}
+
 const app = express();
 app.use(express.static('public_html'));
 app.use(express.json());
-// app.use('app/*/',authenticate);
+app.use('app/*/',authenticate);
 
 app.post('/app/create/game/:user/:diff', (req, res) => {
 
@@ -100,7 +146,7 @@ app.post('/app/create/game/:user/:diff', (req, res) => {
                         board[i][j][0] = String(numBombs);
                     }
                 }
-            }
+            } 
         }
     }
 
@@ -113,7 +159,6 @@ app.get('/app/get/games/:user', (req, res) => {
 
     // TODO - Implement logic to get all games for a user (Will have to change /app/ path to what 
     // the authenticate function is using).
-
 });
 
 app.get('/get/games', (req, res) => {
@@ -128,10 +173,43 @@ app.get('/get/users', (req, res) => {
 
 });
 
+app.get('/find/user/:username/:password', (req,res) => { //checks login is good and registered
+    let u = req.params.username;
+    let p = req.params.password;
+    let p1 = User.find({username:u, password: p}).exec();
+    p1.then((results) => {
+        if (results.length > 0) {
+            let id = addSession(u); //adds cookie session
+            res.cookie('login', {username:u,sid: id}, {maxAge:30000});
+            res.send('login success');
+        } else {
+            res.send('login failed');
+        }
+    })
+    .catch((error) => {
+        res.send('FAIL');
+    });
+});
+
 app.post('/create/user', (req, res) => {
-
     // TODO - Implement logic to create a new user (Stored in request body?)
-
+    let body = req.body;
+    let p1 = User.find({username: body.username}).exec();
+    p1.then((results) => {
+        if(results.length > 0) {  
+            res.send('Username already taken');
+        } else {
+            let newUser = new User(body);
+            let save = newUser.save();
+            save.then( (doc) => {
+                res.send('User successfully created');
+            })
+            save.catch( (err) => {
+                res.send(err);
+            });
+        }
+    })
+    p1.catch((error) => {res.status(500).send('Internal server error')});
 });
 
 app.post('/app/step/:user', (req, res) => {

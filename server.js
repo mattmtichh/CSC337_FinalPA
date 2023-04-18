@@ -24,6 +24,8 @@ var Games = mongoose.model('Games' , GameSchema);
 var UserSchema = new mongoose.Schema( {
     username: String,
     password: String,
+    // salt: ,
+    // hash: ,
     games: [GameSchema]
 })
 var User = mongoose.model('User', UserSchema);
@@ -193,6 +195,13 @@ app.post('/create/user', (req, res) => {
         if(results.length > 0) {  
             res.send('Username already taken');
         } else {
+            // salt and hash
+            // let newSalt = Math.floor((Math.random() = 1000000));
+            // let toHash = req.params.password + newSalt;
+            // var hash = crypto.createHash('sha3-256');
+            // let data = hash.update(toHash, 'utf-8');
+            // let newHash = data.digest('hex');
+
             let newUser = new User(body);
             let save = newUser.save();
             save.then( (doc) => {

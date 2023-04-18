@@ -109,13 +109,15 @@ app.post('/app/create/game/', (req, res) => {
     //         res.status(400).send('Error Processing Difficulty');
     // }
 
-    let body = req.body;
+    let body = JSON.parse(req.body);
     let p1 = User.find({username: body.username}).exec();
     p1.then((results) => {
         if (results.length == 1) {
+            const game = new Games(body);
+            game.save();
             let user = results[0];
             console.log(user.games);
-            user.games.push(body);
+            user.games.push(game);
             user.save();
         } else {
             res.send('Failed.');
@@ -220,5 +222,5 @@ app.post('/app/flag/:user', (req, res) => {
 });
 
 
-const port = 3000;
+const port = 5000;
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));

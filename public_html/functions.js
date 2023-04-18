@@ -127,7 +127,7 @@ function setBoard() {
         }
         
         let url = "/app/create/game";
-        let data = { username: currUser , difficulty: diff, time: Date.now(), gameboard: board};
+        let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'gameboard': board};
         let create = fetch(url, {
             method: 'POST', 
             body: JSON.stringify(data),

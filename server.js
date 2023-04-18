@@ -79,40 +79,73 @@ app.use(express.static('public_html'));
 app.use(express.json());
 app.use('app/*/',authenticate);
 
-app.post('/app/create/game/:user/:diff', (req, res) => {
+app.post('/app/create/game/', (req, res) => {
 
-    const {username, difficulty} = req.params;
-    let config;
-    switch (difficulty) {
-        case 'easy':
-            config = {
-                rows: 8,
-                cols: 8,
-                mines: 10
-            };
-            break;
-        case 'medium':
-            config = {
-                rows: 16,
-                cols: 16,
-                mines: 40
-            };
-            break;
-        case 'hard':
-            config = {
-                rows: 24,
-                cols: 24,
-                mines: 99
-            };
-            break;
-        default:
-            res.status(400).send('Error Processing Difficulty');
-    }
+    // const {username, difficulty} = req.params;
+    // let config;
+    // switch (difficulty) {
+    //     case 'easy':
+    //         config = {
+    //             rows: 8,
+    //             cols: 8,
+    //             mines: 10
+    //         };
+    //         break;
+    //     case 'medium':
+    //         config = {
+    //             rows: 16,
+    //             cols: 16,
+    //             mines: 40
+    //         };
+    //         break;
+    //     case 'hard':
+    //         config = {
+    //             rows: 24,
+    //             cols: 24,
+    //             mines: 99
+    //         };
+    //         break;
+    //     default:
+    //         res.status(400).send('Error Processing Difficulty');
+    // }
 
-
-    // TODO - Finish logic to create a new game (Will have to change /app/ path to what
-
+    let body = req.body;
+    let p1 = User.find({username: body.username}).exec();
+    p1.then((results) => {
+        if (results.length == 1) {
+            let user = results[0];
+            console.log(user.games);
+            user.games.push(body);
+            user.save();
+        } else {
+            res.send('Failed.');
+        }
+    });
+    p1.catch(() => {
+        res.send('Failed.');
+    })
+//     let p2 = Games.find().exec();
+//     p2.then(() => {
+//         let game = new Games(body);
+//         game.save();
+//     })
+//     p2.catch((error) => {alert(error)});
 });
+
+app.get('/get/game/:user', (req,res) => {
+    let u = req.params.user;
+    let p1 = User.find({username:u}).exec();
+    p1.then((results) => {
+        if (results.length == 0) {
+            alert("Something went wrong.");
+        } else {
+            let length = results[0].games.length;
+            console.log(results[0].games);
+            res.send(results[0].games[length-1]);
+        }
+    });
+    p1.catch((error) => {alert(error);});
+})
 
 app.get('/app/get/games/:user', (req, res) => {
 

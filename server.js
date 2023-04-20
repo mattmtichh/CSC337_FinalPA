@@ -197,7 +197,7 @@ app.post('/create/user', (req, res) => {
         } else {
             // salt and hash
             // let newSalt = Math.floor((Math.random() = 1000000));
-            // let toHash = req.params.password + newSalt;
+            // let toHash = body.password + newSalt;
             // var hash = crypto.createHash('sha3-256');
             // let data = hash.update(toHash, 'utf-8');
             // let newHash = data.digest('hex');

@@ -15,7 +15,7 @@ var GameSchema = new mongoose.Schema( {
     difficulty: String,
     time: Number,
     gameboard: {
-        type: [[String, Boolean, Boolean]],
+        type: [[[String, Boolean, Boolean]]],
         required: true
     }
 })
@@ -111,11 +111,37 @@ app.post('/app/create/game/', (req, res) => {
     //         res.status(400).send('Error Processing Difficulty');
     // }
 
-    let body = JSON.parse(req.body);
+    let body = req.body;
     let p1 = User.find({username: body.username}).exec();
     p1.then((results) => {
         if (results.length == 1) {
-            const game = new Games(body);
+
+            // Issue: parsing body leaves board without the string type of its first index
+            var gSize = 0;
+            if (req.body.difficulty == 'easy') {
+                gSize = 8;
+            }
+            if (req.body.difficulty == 'medium') {
+                gsize = 16;
+            }
+            if (req.body.difficulty == 'hard') {
+                gsize = 24;
+            }
+            gb = req.body.gameboard;
+            //gb = JSON.parse(req.body.gameboard);
+            for (let i = 0; i < gSize; i++) {
+                for (let j = 0; j < gSize; j++) {
+                    //JSON.stringify(gb[i][j][0]);
+                    JSON.parse(gb[i][j][1]);
+                    JSON.parse(gb[i][j][2]);
+                }
+            }
+            const game = new Games({
+                user: req.body.user,
+                difficulty: req.body.difficulty,
+                time: req.body.time,
+                gameboard: gb
+            });
             game.save();
             let user = results[0];
             console.log(user.games);

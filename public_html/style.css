@@ -1,6 +1,7 @@
 body {
     background-color: rgb(0, 140, 255);
     color: rgb(255, 255, 255);
+    margin: 50px;
 }
 
 .inputBlock {
@@ -9,17 +10,20 @@ body {
 }
 
 .signin {
+    font-size: 20px;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 #homeDiv {
-    border: solid 3px black;
-    padding: 10px;
+    border: solid 10px rgb(0, 90, 163);
+    border-radius: 10px;
+    background-color: rgb(0, 115, 208);
 }
 
 .subDiv {
-    padding: 10%;
-    display: inline-block;
+    padding: 5%;
+    display: block;
 }
 
 #leaderboardDiv {
@@ -31,19 +35,40 @@ body {
     color: blue;
 }
 
+h1 {
+    font-size: 50px;
+}
+
+#gameDifficulty {
+    font-size: 20px;
+    background-color: rgb(0, 90, 163);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    border-style: solid;
+    border-width: 5px;
+    border-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    margin-left: 50px;
+    padding: 10px;
+
+}
+
 button {
-    background-color: rgb(0, 140, 255);
+    background-color: rgb(0, 90, 163);
+    font-size: 20px;
     color: rgb(255, 255, 255);
     padding: 10px;
     border-style: solid;
     border-width: 5px;
     border-color: rgb(255, 255, 255);
     border-radius: 10px;
+    margin-left: 50px;
+    margin-top: 10px;
 }
 
 button:hover {
     background-color: rgb(255, 255, 255);
-    color: rgb(0, 140, 255);
-    border-color: rgb(0, 140, 255); 
+    color: rgb(0, 90, 163);
+    border-color: rgb(0, 90, 163); 
     transition: 0.5s;
 }

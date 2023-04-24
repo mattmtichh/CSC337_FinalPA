@@ -209,7 +209,32 @@ function setLeaderboard(games) {
     for (let i = 0; i < topten.length; i++) {
         let game = topten[i];
         let gameDiv = document.createElement("div");
-        gameDiv.textContent = (i+1)+".  User: "+game[0]+ "      Difficulty: "+game[1]+"      Time: "+game[2];
+        let userDiv = document.createElement("div");
+        let diffDiv = document.createElement("div");
+        let timeDiv = document.createElement("div");
+        userDiv.textContent = (i+1) + ". User: " + game[0];
+        userDiv.style.margin = "5px";
+        diffDiv.textContent =  "Difficulty: " + game[1];
+        diffDiv.style.margin = "5px";
+        timeDiv.textContent = "Time: " + game[2];
+        timeDiv.style.margin = "5px";
+        gameDiv.append(userDiv);
+        gameDiv.append(diffDiv);
+        gameDiv.append(timeDiv);
+        gameDiv.style.backgroundColor = "rgb(0, 115, 208)";
+        gameDiv.style.color = "white";
+        gameDiv.style.padding = "10px";
+        gameDiv.style.margin = "3%";
+        gameDiv.style.borderRadius = "10px";
         leaderboard.appendChild(gameDiv);
     }
+}
+
+function goHome() {
+    setUser();
+    window.location.href = "main.html";
+}
+
+function saveGame() {
+    // post game to be played later 
 }

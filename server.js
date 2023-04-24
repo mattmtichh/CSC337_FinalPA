@@ -142,7 +142,7 @@ app.get('/get/game/:user', (req,res) => { // May not need this
             res.send(results[0].games[length-1]);
         }
     });
-    p1.catch((error) => {alert(error);});
+    p1.catch((error) => {aleconsole.logrt(error);});
 })
 
 app.get('/app/get/games/:user', (req, res) => {
@@ -153,13 +153,13 @@ app.get('/app/get/games/:user', (req, res) => {
     let p1 = User.find({username:u}).exec();
     p1.then((results) => {
         if (results.length == 0) {
-            alert("Something went wrong.");
+            res.send("Something went wrong.");
         } else {
             let obj = results[0];
             res.send(obj);
         }
     });
-    p1.catch((error) => {alert(error);});
+    p1.catch((error) => {console.log(error);});
 });
 
 app.get('/get/games', (req, res) => {
@@ -170,7 +170,7 @@ app.get('/get/games', (req, res) => {
     p1.then((results) => {
         res.send(results);
     });
-    p1.catch((error) => {alert(error);});
+    p1.catch((error) => {console.log(error);});
 });
 
 app.get('/get/users', (req, res) => {

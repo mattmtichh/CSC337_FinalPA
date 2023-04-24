@@ -11,7 +11,7 @@ mongoose.connection.on('error', () => {
 });
 
 var GameSchema = new mongoose.Schema( {
-    user: String,
+    username: String,
     difficulty: String,
     time: Number,
     gameboard: {
@@ -83,40 +83,13 @@ app.use('app/*/',authenticate);
 
 app.post('/app/create/game/', (req, res) => {
 
-    // const {username, difficulty} = req.params;
-    // let config;
-    // switch (difficulty) {
-    //     case 'easy':
-    //         config = {
-    //             rows: 8,
-    //             cols: 8,
-    //             mines: 10
-    //         };
-    //         break;
-    //     case 'medium':
-    //         config = {
-    //             rows: 16,
-    //             cols: 16,
-    //             mines: 40
-    //         };
-    //         break;
-    //     case 'hard':
-    //         config = {
-    //             rows: 24,
-    //             cols: 24,
-    //             mines: 99
-    //         };
-    //         break;
-    //     default:
-    //         res.status(400).send('Error Processing Difficulty');
-    // }
-
     let body = req.body;
     let p1 = User.find({username: body.username}).exec();
     p1.then((results) => {
         if (results.length == 1) {
 
             // Issue: parsing body leaves board without the string type of its first index
+            // Resolved: only parsed booleans and left string value data stringified
             var gSize = 0;
             if (req.body.difficulty == 'easy') {
                 gSize = 8;
@@ -137,32 +110,28 @@ app.post('/app/create/game/', (req, res) => {
                 }
             }
             const game = new Games({
-                user: req.body.user,
+                username: req.body.username,
                 difficulty: req.body.difficulty,
                 time: req.body.time,
                 gameboard: gb
             });
             game.save();
             let user = results[0];
-            console.log(user.games);
             user.games.push(game);
-            user.save();
+            return user.save();
         } else {
             res.send('Failed.');
         }
     });
+    p1.then(() => {
+        res.send("Success");
+    });
     p1.catch(() => {
         res.send('Failed.');
     })
-//     let p2 = Games.find().exec();
-//     p2.then(() => {
-//         let game = new Games(body);
-//         game.save();
-//     })
-//     p2.catch((error) => {alert(error)});
 });
 
-app.get('/get/game/:user', (req,res) => {
+app.get('/get/game/:user', (req,res) => { // May not need this 
     let u = req.params.user;
     let p1 = User.find({username:u}).exec();
     p1.then((results) => {
@@ -170,7 +139,6 @@ app.get('/get/game/:user', (req,res) => {
             alert("Something went wrong.");
         } else {
             let length = results[0].games.length;
-            console.log(results[0].games);
             res.send(results[0].games[length-1]);
         }
     });
@@ -181,12 +149,28 @@ app.get('/app/get/games/:user', (req, res) => {
 
     // TODO - Implement logic to get all games for a user (Will have to change /app/ path to what 
     // the authenticate function is using).
+    let u = req.params.user;
+    let p1 = User.find({username:u}).exec();
+    p1.then((results) => {
+        if (results.length == 0) {
+            alert("Something went wrong.");
+        } else {
+            let obj = results[0];
+            res.send(obj);
+        }
+    });
+    p1.catch((error) => {alert(error);});
 });
 
 app.get('/get/games', (req, res) => {
 
     // TODO - Implement logic to get all games (Leaderboards can be accessed by anyone?)
 
+    let p1 = Games.find().exec();
+    p1.then((results) => {
+        res.send(results);
+    });
+    p1.catch((error) => {alert(error);});
 });
 
 app.get('/get/users', (req, res) => {

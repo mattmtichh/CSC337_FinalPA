@@ -5,8 +5,18 @@
         <title>Minesweeper</title>
         <link id="cssFile" rel="stylesheet" type="text/css" href="style.css">
         <script src="functions.js"></script>
+        <script src="game.js"></script>
     </head>
-    <body onload="createNewGame()">
+    <body>
         <h1>Minesweeper</h1>
+        <div id="gameDiv">
+            <select id="gameDifficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+           <button onclick="createNewGame()">Create Game</button>
+        </div>
+        
     </body>
 </html>

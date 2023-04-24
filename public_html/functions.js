@@ -49,16 +49,17 @@ function createAccount() { // need to figure out password salting and hashing
 
 function createNewGame() {
     setUser();
-    let u = currUser;
-    let url = "/get/game/"+u;
-    let get = fetch(url);
-    get.then(response => response.json())
-    get.then(data => {
-        gameBoard = data;
-        console.log(gameBoard);
-        alert("Game is here");
-    });
-    get.catch((error) => {alert(error);});
+    // let u = currUser;
+    // let url = "/get/game/"+u;
+    // let get = fetch(url);
+    // get.then(response => response.json())
+    // get.then(data => {
+    //     gameBoard = data;
+    //     alert("Game is here");
+    // });
+    // get.catch((error) => {alert(error);});
+    let difficulty = document.getElementById('gameDifficulty').value;
+    let newGame = new MinesweeperGame(difficulty);
 }
 
 function setUser() {
@@ -71,7 +72,7 @@ function setUser() {
 
 function setBoard() {
     setUser();
-    let diff = document.getElementById('gameDifficulty').value;
+    let diff = "easy" //document.getElementById('gameDifficulty').value;
     var board;
     var totalMines;
     if (diff === "easy") {
@@ -133,14 +134,82 @@ function setBoard() {
             body: JSON.stringify(data),
             headers: {"Content-Type": "application/json"}
         });
-        create.then(() => { // adds listing to user schema and reroutes to home page
-            alert('Game created');
-            window.location.href = "game.html";
+        create.then((response) => { // adds listing to user schema and reroutes to home page
+            response.text().then((message) => {
+                if (message === "Success") {
+                    window.location.href = "game.html";
+                } else {
+                    alert("Something went wrong.");
+                }
+            });
         });
-        create.catch(
-            error => console.error(error)
-        );
+        create.catch((error) => {
+            console.log(error);
+        });
     } else {
         alert("Something went wrong.");
+    }
+}
+
+function goToGame() {
+    window.location.href = "game.html";
+}
+
+function goToLeaderboard() {
+    window.location.href = "leaderboard.html";
+}
+
+function getMyStats() {
+    setUser();
+    let url = '/app/get/games/'+currUser;
+    let p1 = fetch(url);
+    p1.then((response) => {
+        response.json().then((obj) => {
+            let games = obj.games;
+            setLeaderboard(games);
+        }).catch((error) => {
+            alert('An error occurred');
+        });
+    });
+}
+
+function getGlobal() {
+    setUser();
+    let url = '/get/games/';
+    let p1 = fetch(url);
+    p1.then((response) => {
+        response.json().then((games) => {
+            setLeaderboard(games);
+        }).catch((error) => {
+            alert('An error occurred');
+        });
+    });
+}
+
+function setLeaderboard(games) {
+    let leaderboard = document.getElementById("leaderboardDiv");
+    leaderboard.innerHTML = "";
+    let topten = [];
+    games.forEach((game) => {
+        let toString = [game.username, game.difficulty, game.time];
+        if (topten.length < 10) {
+            topten.push(toString);
+            topten.sort((a,b) => b[2] - a[2]);
+        } else {
+            for (let i = 0; i < topten.length; i++) {
+                if (toString[2] > topten[i][2]) {
+                    topten.push(toString);
+                    topten.sort((a,b) => b[2] - a[2]);
+                    topten.splice(10,1);
+                    break;
+                }
+            }
+        }
+    });
+    for (let i = 0; i < topten.length; i++) {
+        let game = topten[i];
+        let gameDiv = document.createElement("div");
+        gameDiv.textContent = (i+1)+".  User: "+game[0]+ "      Difficulty: "+game[1]+"      Time: "+game[2];
+        leaderboard.appendChild(gameDiv);
     }
 }

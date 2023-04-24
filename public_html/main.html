@@ -8,21 +8,7 @@
     </head>
     <body>
         <h1>Homepage</h1>
-        <div id="homeDiv">
-            <div class="subDiv">
-                <h1>Create a new game</h1>
-                <select id="gameDifficulty">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-                <button type="submit" onclick="setBoard()">Create Game</button>
-            </div>
-            <div class="subDiv">
-                <h1>View Leaderboards</h1>
-                <button>Your Stats</button>
-                <button>Leaderboards</button>
-            </div>
-        </div>
+        <button type="submit" onclick="goToGame()" id="gameButton">Play Game</button>
+        <button onclick="goToLeaderboard()" id="leadButton">Leaderboards</button>
     </body>
 </html>

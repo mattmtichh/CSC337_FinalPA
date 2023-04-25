@@ -105,8 +105,11 @@ button:hover {
     left: auto;
 }
 
-#gameDiv {
+#gameHeadDiv {
     position: fixed;
-    left: 35%;
-    right: auto;
+    top: 9%;
+    right: 7%;
+    bottom: auto;
+    left: auto;
 }
+

@@ -105,4 +105,27 @@ class MinesweeperGame {
             console.log(row);
         }
     } 
+
+    saveGame(status) { // To be edited
+        let url = "/app/create/game";
+        let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'status': status, 'gameboard': board};
+        let create = fetch(url, {
+            method: 'POST', 
+            body: JSON.stringify(data),
+            headers: {"Content-Type": "application/json"}
+        });
+        create.then((response) => { // adds listing to user schema and reroutes to home page
+            response.text().then((message) => {
+                if (message === "Success") {
+                    window.location.href = "game.html";
+                } else {
+                    alert("Something went wrong.");
+                }
+            });
+        });
+        create.catch((error) => {
+            console.log(error);
+        });
+    }
 }
+

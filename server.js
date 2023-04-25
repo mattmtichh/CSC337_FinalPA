@@ -14,6 +14,7 @@ var GameSchema = new mongoose.Schema( {
     username: String,
     difficulty: String,
     time: Number,
+    status: Boolean, // true if game is
     gameboard: {
         type: [[[String, Boolean, Boolean]]],
         required: true

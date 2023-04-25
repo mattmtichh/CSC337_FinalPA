@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 const express = require('express');
-const parser = require('body-parser')
+const parser = require('body-parser');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const connection_string = 'mongodb+srv://csc337:csc337@minesweepercluster.nufi7ln.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(connection_string, { useNewUrlParser: true });
@@ -25,8 +26,8 @@ var Games = mongoose.model('Games' , GameSchema);
 var UserSchema = new mongoose.Schema( {
     username: String,
     password: String,
-    // salt: ,
-    // hash: ,
+    salt: Number,
+    hash: String,
     games: [GameSchema]
 })
 var User = mongoose.model('User', UserSchema);
@@ -183,12 +184,23 @@ app.get('/get/users', (req, res) => {
 app.get('/find/user/:username/:password', (req,res) => { //checks login is good and registered
     let u = req.params.username;
     let p = req.params.password;
-    let p1 = User.find({username:u, password: p}).exec();
+    let p1 = User.find({username:u}).exec();
     p1.then((results) => {
-        if (results.length > 0) {
-            let id = addSession(u); //adds cookie session
-            res.cookie('login', {username:u,sid: id}, {maxAge:30000});
-            res.send('login success');
+        if (results.length == 1) {
+            // reHash password to see if it matches the hashed password in the database
+            let toHash = p + results[0].salt;
+            var hash = crypto.createHash('sha3-256');
+            let data = hash.update(toHash, 'utf-8');
+            let newHash = data.digest('hex');
+
+            if (newHash === results[0].hash) { // if successful match
+                let id = addSession(u); //adds cookie session
+                res.cookie('login', {username:u,sid: id}, {maxAge:30000});
+                res.send('login success');
+            } else {
+                res.send('login failed');
+            }
+
         } else {
             res.send('login failed');
         }
@@ -207,13 +219,20 @@ app.post('/create/user', (req, res) => {
             res.send('Username already taken');
         } else {
             // salt and hash
-            // let newSalt = Math.floor((Math.random() = 1000000));
-            // let toHash = body.password + newSalt;
-            // var hash = crypto.createHash('sha3-256');
-            // let data = hash.update(toHash, 'utf-8');
-            // let newHash = data.digest('hex');
+            let newSalt = Math.floor((Math.random() * 1000000));
+            let toHash = body.password + newSalt;
+            var hash = crypto.createHash('sha3-256');
+            let data = hash.update(toHash, 'utf-8');
+            let newHash = data.digest('hex');
 
-            let newUser = new User(body);
+            //let newUser = new User(body);
+            newUser = new User({
+                username: body.username,
+                password: body.password,
+                salt: newSalt,
+                hash: newHash,
+                games: body.games
+            })
             let save = newUser.save();
             save.then( (doc) => {
                 res.send('User successfully created');

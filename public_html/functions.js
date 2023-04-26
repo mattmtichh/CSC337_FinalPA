@@ -1,7 +1,15 @@
 
 var currUser = '';
-var gameBoard;
+var theGame;
 
+const STATUS = {
+    EMPTY: "empty",
+    NUMBER: "number",
+    HIDDEN: "hidden",
+    FLAGGED: "flagged"
+}
+
+// COMPLETED
 function login() {
     let u = document.getElementById("existingUser").value;
     let p = document.getElementById("existingPassword").value;
@@ -24,7 +32,8 @@ function login() {
     document.getElementById("existingPassword").value = '';
 }
 
-function createAccount() { // need to figure out password salting and hashing
+// COMPLETED
+function createAccount() { 
     let u = document.getElementById("newUser").value;
     let p = document.getElementById("newPassword").value;
     let g = [];
@@ -41,26 +50,24 @@ function createAccount() { // need to figure out password salting and hashing
         })
     });
     create.catch((error) => alert(error));
-    document.getElementById("newUser").value = ''; //resets textbox
+    document.getElementById("newUser").value = '';
     document.getElementById("newPassword").value = '';
 }
 
+// TODO
 function createNewGame() {
     setUser();
-    // let u = currUser;
-    // let url = "/get/game/"+u;
-    // let get = fetch(url);
-    // get.then(response => response.json())
-    // get.then(data => {
-    //     gameBoard = data;
-    //     alert("Game is here");
-    // });
-    // get.catch((error) => {alert(error);});
     let difficulty = document.getElementById('gameDifficulty').value;
-    var newGame = new MinesweeperGame(difficulty);
-    newGame.printBoardToConsole();
+    theGame = new MinesweeperGame(difficulty);
+    if (theGame != null) {
+        printBoardToDOM();
+    } else {
+        alert("Error in global game creation.");
+    }
+    
 }
 
+// COMPLETED
 function setUser() {
     currUser = document.cookie.split('%22')[3]; //this separates the username from the cookie and assigns it to currUser
     if (currUser == undefined) { //checks if cookie has expired
@@ -69,95 +76,42 @@ function setUser() {
     }
 }
 
+// RENAME TO SAVE GAME?
 function setBoard() {
-    setUser();
-    let diff = "easy" //document.getElementById('gameDifficulty').value;
-    var board;
-    var totalMines;
-    if (diff === "easy") {
-        board = new Array(8); // the parameter in the Array object was config.rows, changed due to switching to client side creation of the board
-        totalMines = 10;
-    } else if (diff === "medium") {
-        board = new Array(16);
-        totalMines = 40;
-    } else if (diff === "hard"){
-        board = new Array(24);
-        totalMines = 99;
-    }
-
-    if (board != undefined) {
-        let boardSize = board.length;
-        for (let i = 0; i < boardSize; i++) {
-            board[i] = new Array(boardSize);
-            for (let j = 0; j < boardSize; j++) {
-                board[i][j] = ['e', false, true];
-            }
-        }
-    
-        let mines = 0;
-        while (mines < totalMines) {
-            let row = Math.floor(Math.random() * boardSize);
-            let col = Math.floor(Math.random() * boardSize);
-            if (board[row][col][0] !== "*") {
-                board[row][col][0] = "*";
-                mines++;
-            }
-        }
-
-        for (let i = 0; i < boardSize; i++) {
-            for (let j = 0; j < boardSize; j++) {
-                if (board[i][j][0] !== "*") {
-                    let numBombs = 0;
-                    for (let ii = Math.max(0, i - 1); ii <= Math.min(i + 1, boardSize - 1); ii++) {
-                        for (let jj = Math.max(0, j - 1); jj <= Math.min(j + 1, boardSize - 1); jj++) {
-                            if (board[ii][jj][0] === "*") {
-                                numBombs++;
-                            }
-                        }
-                    }
-                    if (board[i][j][0] === 'e') {
-                        if (numBombs === 0) {
-                            board[i][j][0] = 'e';
-                        } else {
-                            board[i][j][0] = String(numBombs);
-                        }
-                    }
-                } 
-            }
-        }
         
-        let url = "/app/create/game";
-        let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'gameboard': board};
-        let create = fetch(url, {
-            method: 'POST', 
-            body: JSON.stringify(data),
-            headers: {"Content-Type": "application/json"}
+    let url = "/app/create/game";
+    let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'gameboard': board};
+    let create = fetch(url, {
+        method: 'POST', 
+        body: JSON.stringify(data),
+        headers: {"Content-Type": "application/json"}
+    });
+    create.then((response) => { // adds listing to user schema and reroutes to home page
+        response.text().then((message) => {
+            if (message === "Success") {
+                window.location.href = "game.html";
+            } else {
+                alert("Something went wrong.");
+            }
         });
-        create.then((response) => { // adds listing to user schema and reroutes to home page
-            response.text().then((message) => {
-                if (message === "Success") {
-                    window.location.href = "game.html";
-                } else {
-                    alert("Something went wrong.");
-                }
-            });
-        });
-        create.catch((error) => {
-            console.log(error);
-        });
-    } else {
-        alert("Something went wrong.");
-    }
+    });
+    create.catch((error) => {
+        console.log(error);
+    });
+    
 }
 
+// COMPLETED
 function goToGame() {
     window.location.href = "game.html";
 }
 
+// COMPLETED
 function goToLeaderboard() {
     window.location.href = "leaderboard.html";
 }
 
+// COMPLETED
 function getMyStats() {
     setUser();
     let url = '/app/get/games/'+currUser;
@@ -172,6 +126,7 @@ function getMyStats() {
     });
 }
 
+
 function getGlobal() {
     setUser();
     let url = '/get/games/';
@@ -185,6 +140,7 @@ function getGlobal() {
     });
 }
 
+// Might need to change with updated schema, TBD
 function setLeaderboard(games) {
     let leaderboard = document.getElementById("leaderboardDiv");
     leaderboard.innerHTML = "";
@@ -229,11 +185,64 @@ function setLeaderboard(games) {
     }
 }
 
+// COMPLETED
 function goHome() {
     setUser();
     window.location.href = "main.html";
 }
 
+// DELETE? OR MOVE POST LOGIC HERE
 function saveGame() {
     // post game to be played later 
+}
+
+function printBoardToDOM() {
+    if (theGame != null) {
+        let mainDiv = document.getElementById("gameboardDiv");
+        mainDiv.innerHTML = ""; 
+        for (let i = 0; i < theGame.size; i++) {
+            let row = theGame.board[i];
+            let rowDiv = document.createElement("div");
+            for (let j = 0; j < theGame.size; j++) {
+                
+                box = row[j];
+                let temp = document.createElement("div");
+                temp.style.display = "inline-block";
+                let val = box[0];
+                temp.textContent = val;
+                rowDiv.appendChild(temp);
+            }
+            mainDiv.appendChild(rowDiv);
+        }
+    } else {
+        alert("No Game Found.");
+    }
+
+    // const divList = document.querySelectorAll('div'); // Get all div elements
+    // const numCols = 3;                                // Set number of columns in layout
+
+    // divList.forEach((div, index) => {
+    //     div.addEventListener('left-click', () => {
+    //         const row = Math.floor(index / numCols) + 1; // Calculate row
+    //         const col = (index % numCols) + 1;           // Calculate column
+            
+    //     });
+    //     div.addEventListener('right-click', () => {
+    //         const row = Math.floor(index / numCols) + 1; // Calculate row
+    //         const col = (index % numCols) + 1;           // Calculate column
+            
+    //     });
+    // });
+
+}
+
+// TODO: make a hint button, loop with random rows and col on board for a spot that hasn't been selected and isn't a bomb
+// [2] true to false
+function giveHint() {    
+    while (true) {
+        var row = Math.floor((Math.random() * theGame.size));
+        var col = Math.floor((Math.random() * theGame.size));
+
+        // if (theGame.board[row][col] != )
+    }
 }

@@ -5,18 +5,22 @@ class MinesweeperGame {
         this.totalMines;
         this.diff = diff;
         this.status;
+        this.size;
 
         if (this.diff === "easy") {
             // The parameter in the Array object was config.rows, 
             // changed due to switching to client side creation of the board
             this.board = new Array(8);
             this.totalMines = 10;
+            this.size = 8;
         } else if (this.diff === "medium") {
             this.board = new Array(16);
             this.totalMines = 40;
+            this.size = 16;
         } else if (this.diff === "hard"){
             this.board = new Array(24);
             this.totalMines = 99;
+            this.size = 24;
         }
 
         this.generateBoard();
@@ -31,7 +35,7 @@ class MinesweeperGame {
 
     }
 
-    // Should be complete
+    // COMPLETE
     generateBoard() {
         if (this.board != undefined) {
             let boardSize = this.board.length;
@@ -76,30 +80,63 @@ class MinesweeperGame {
         }
     }
 
-    setFlag() {
+
+    setFlag(x, y) {
         // TODO
     }
 
-    removeFlag() {
+    removeFlag(x, y) {
         // TODO
     }
 
-    makeStep() {
+    makeStep(x, y) {
         // TODO
         // If Bomb or Number is clicked 
         // Returns when the "queue" for adjacant spaces is only full of number spaces, Uncover all of them
+        
     }
     
+    // COMPLETE?
     isGameOver() {
-        // TODO
-        // if numBombs == numHiddenSpaces or bomb hit
+        let numBombs;
+        let numHiddenSpaces;
+        for (let i=0; i<this.board.length; i++) {
+            let row = this.board[i];
+            for (let j=0; j<row.length; j++) {
+                if (row[j][0] == "*") {
+                    if (row[j][2] == false) {
+                        this.status = "LOST";
+                        return true;
+                    } else {
+                        numBombs += 1;
+                        numHiddenSpaces += 1;
+                    }
+                } 
+                else if (row[j][2] == true) {
+                    numHiddenSpaces += 1;
+                }
+            }
+        }
+        if (numBombs == numHiddenSpaces) {
+            this.status = "WON";
+            return true;
+        } {
+            this.status = "ONGOING";
+            return false;
+        }
     }
 
-    // "Chould" be complete
+    // COMPLETE
     printBoardToConsole() {
         for (let i=0; i<this.board.length; i++) {
             let row = this.board[i];
-            console.log(row);
+            let res = ''
+            res += "(";
+            for (let element in row) {
+                res += " " + row[element][0].toString() + " "
+            }
+            res += ")"
+            console.log(res);
         }
     } 
 

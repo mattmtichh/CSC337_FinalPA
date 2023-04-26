@@ -1,6 +1,3 @@
-const res = require("express/lib/response");
-const { cookie } = require("express/lib/response");
-
 class MinesweeperGame {
     
     constructor(diff) {
@@ -101,31 +98,30 @@ class MinesweeperGame {
     // "Chould" be complete
     printBoardToConsole() {
         for (let i=0; i<this.board.length; i++) {
-            let row = board[i];
+            let row = this.board[i];
             console.log(row);
         }
     } 
 
-    saveGame(status) { // To be edited
-        let url = "/app/create/game";
-        let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'status': status, 'gameboard': board};
-        let create = fetch(url, {
-            method: 'POST', 
-            body: JSON.stringify(data),
-            headers: {"Content-Type": "application/json"}
-        });
-        create.then((response) => { // adds listing to user schema and reroutes to home page
-            response.text().then((message) => {
-                if (message === "Success") {
-                    window.location.href = "game.html";
-                } else {
-                    alert("Something went wrong.");
-                }
-            });
-        });
-        create.catch((error) => {
-            console.log(error);
-        });
-    }
+    // saveGame(status) { // To be edited
+    //     let url = "/app/create/game";
+    //     let data = { 'username': currUser , 'difficulty': this.diff, 'time': Date.now(), 'status': status, 'gameboard': board};
+    //     let create = fetch(url, {
+    //         method: 'POST', 
+    //         body: JSON.stringify(data),
+    //         headers: {"Content-Type": "application/json"}
+    //     });
+    //     create.then((response) => { // adds listing to user schema and reroutes to home page
+    //         response.text().then((message) => {
+    //             if (message === "Success") {
+    //                 window.location.href = "game.html";
+    //             } else {
+    //                 alert("Something went wrong.");
+    //             }
+    //         });
+    //     });
+    //     create.catch((error) => {
+    //         console.log(error);
+    //     });
+    // }
 }
-

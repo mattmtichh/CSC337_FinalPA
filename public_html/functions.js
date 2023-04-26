@@ -1,5 +1,3 @@
-const res = require("express/lib/response");
-const { cookie } = require("express/lib/response");
 
 var currUser = '';
 var gameBoard;
@@ -59,7 +57,8 @@ function createNewGame() {
     // });
     // get.catch((error) => {alert(error);});
     let difficulty = document.getElementById('gameDifficulty').value;
-    let newGame = new MinesweeperGame(difficulty);
+    var newGame = new MinesweeperGame(difficulty);
+    newGame.printBoardToConsole();
 }
 
 function setUser() {

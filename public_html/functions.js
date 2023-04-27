@@ -267,7 +267,7 @@ function giveHint() {
         var col = Math.floor((Math.random() * theGame.size));
 
         // if random selects an empty cell, set that cell to unhidden
-        if (theGame.board[row][col] === 'e') {
+        if (theGame.board[row][col][0] === 'e') {
             theGame.board[row][col][2] = false;
             theGame.hints--; // subtract from amount of hints
             break;

@@ -6,6 +6,7 @@ class MinesweeperGame {
         this.diff = diff;
         this.status;
         this.size;
+        this.hints = 3;
 
         if (this.diff === "easy") {
             // The parameter in the Array object was config.rows, 

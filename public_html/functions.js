@@ -236,13 +236,25 @@ function printBoardToDOM() {
 
 }
 
-// TODO: make a hint button, loop with random rows and col on board for a spot that hasn't been selected and isn't a bomb
+// Hint button, loop with random rows and col on board for a spot that hasn't been selected and isn't a bomb
 // [2] true to false
-function giveHint() {    
+// TODO: make action to reveal the cell based on the onclick of the hint button,
+// set limit on amount of hints used in a game. - make hints a number field in game schema and check it when hint button is clicked? 
+function giveHint() {   
+    if (theGame.hints == 0) { // if out of hints
+        alert("Out of hints.");
+    } else {
     while (true) {
         var row = Math.floor((Math.random() * theGame.size));
         var col = Math.floor((Math.random() * theGame.size));
 
-        // if (theGame.board[row][col] != )
+        // if random selects an empty cell, set that cell to unhidden
+        if (theGame.board[row][col] === 'e') {
+            theGame.board[row][col][2] = false;
+            theGame.hints--; // subtract from amount of hints
+            break;
+        }
+
     }
+}
 }

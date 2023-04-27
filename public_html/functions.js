@@ -197,44 +197,62 @@ function saveGame() {
 }
 
 function printBoardToDOM() {
-    if (theGame != null) {
-        let mainDiv = document.getElementById("gameboardDiv");
-        mainDiv.innerHTML = ""; 
-        for (let i = 0; i < theGame.size; i++) {
+    if (theGame != null) { // checks for game
+        let mainDiv = document.getElementById("gameboardDiv"); //gets the main game div
+        mainDiv.innerHTML = ""; // resets main game div
+        for (let i = 0; i < theGame.size; i++) { //iterates through rows of the game board
             let row = theGame.board[i];
-            let rowDiv = document.createElement("div");
-            for (let j = 0; j < theGame.size; j++) {
+            let rowDiv = document.createElement("div"); //creates a div for each row
+            for (let j = 0; j < theGame.size; j++) { // iterates through each cell in row
                 
                 box = row[j];
-                let temp = document.createElement("div");
+                let temp = document.createElement("div"); // div for each cell
                 temp.style.display = "inline-block";
-                let val = box[0];
-                temp.textContent = val;
+                let cell = document.createElement("button"); // creates a button for each cell
+                
+                cell.onclick = (() => {  // assigns onclick function to reveal the cell, need to switch to makeStep() in game.js
+                    reveal(i,j);
+                    printBoardToDOM(); //recurses to reprint the board after cell is revealed
+                    if (theGame.isGameOver()) {
+                        alert(theGame.status);
+                    }
+                });
+                if (!box[2]) { // if cell is NOT hidden, sets the button text to the cell value
+                    cell.textContent = box[0];
+                } else {
+                    cell.textContent = " ";
+                }
+                temp.appendChild(cell);  // html div appending
                 rowDiv.appendChild(temp);
+
             }
             mainDiv.appendChild(rowDiv);
         }
     } else {
         alert("No Game Found.");
     }
-
-    // const divList = document.querySelectorAll('div'); // Get all div elements
-    // const numCols = 3;                                // Set number of columns in layout
-
-    // divList.forEach((div, index) => {
-    //     div.addEventListener('left-click', () => {
-    //         const row = Math.floor(index / numCols) + 1; // Calculate row
-    //         const col = (index % numCols) + 1;           // Calculate column
-            
-    //     });
-    //     div.addEventListener('right-click', () => {
-    //         const row = Math.floor(index / numCols) + 1; // Calculate row
-    //         const col = (index % numCols) + 1;           // Calculate column
-            
-    //     });
-    // });
-
 }
+
+// const divList = document.querySelectorAll('div'); // Get all div elements
+     // const numCols = 3;                                // Set number of columns in layout
+ 
+     // divList.forEach((div, index) => {
+     //     div.addEventListener('left-click', () => {
+     //         const row = Math.floor(index / numCols) + 1; // Calculate row
+     //         const col = (index % numCols) + 1;           // Calculate column
+             
+     //     });
+     //     div.addEventListener('right-click', () => {
+     //         const row = Math.floor(index / numCols) + 1; // Calculate row
+     //         const col = (index % numCols) + 1;           // Calculate column
+             
+     //     });
+     // });
+
+function reveal(row,col) {
+    theGame.board[row][col][2] = false;
+}
+
 
 // Hint button, loop with random rows and col on board for a spot that hasn't been selected and isn't a bomb
 // [2] true to false

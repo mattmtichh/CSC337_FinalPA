@@ -26,14 +26,6 @@ class MinesweeperGame {
 
         this.generateBoard();
         this.printBoardToConsole();
-
-        // Clear game.html body content (keep header)
-        // Insert elements for game array into DOM
-        // Place onclick values on the DOM elements
-        // Utilize statric images? (i.e. for flag and bombs)
-
-        // Send fetch request to server to save board database.
-
     }
 
     // COMPLETE
@@ -81,20 +73,73 @@ class MinesweeperGame {
         }
     }
 
-
-    setFlag(x, y) {
-        // TODO
+    // COMPLETE
+    toggleFlag(i, j) {
+        if (this.board[i][j][2] != false) {
+            if (this.board[i][j][1] == false) {
+                this.board[i][j][1] = true;
+            } else {
+                this.board[i][j][1] = false;
+            }
+        }
     }
 
-    removeFlag(x, y) {
-        // TODO
+    // TODO
+    allNums(cellLst) {
+        for (let i = 0; i < cellLst.length; i++) {
+            if (cellLst[i][0] === "e" || 
+                cellLst[i][0] === "*") {
+                return false;
+            }
+        }
+        return true;
     }
 
+    // POSSIBLY COMPLETE (NEED TO TEST BFS)
     makeStep(x, y) {
-        // TODO
-        // If Bomb or Number is clicked 
-        // Returns when the "queue" for adjacant spaces is only full of number spaces, Uncover all of them
         
+        // If the cell is flagged, do nothing
+        if (this.board[x][y][1] === true) {
+            return;
+        }
+
+        // If the cell is a number or bomb, reveal tile
+        if (this.board[x][y][0] !== "e") {
+            this.board[x][y][2] = false;
+            return;
+        }
+
+        // If the cell is empty, reveal all surrounding cells. This is done using a BFS
+        // algorithm. The queue will hold the coordinates of the cells to be checked, and
+        // the visited set will hold the coordinates of the cells that have already been
+        // visited.
+        let cellQueue = [`(${x}, ${y})`];
+        let boardSize = this.board.length;
+        let visited = new Set();
+        while (cellQueue.length > 0) {
+
+            const [curx, cury] = cellQueue.shift();
+            let cell = this.board[x][y];
+            cell[2] = false;
+
+            // This double loop will check the 8 cells surrounding the current cell, if the cell is 
+            // empty, it will be added to the queue to be checked later, if it is a number or bomb,
+            // it will be ignored but still marked visited.
+            for (let i = Math.max(0, curx - 1); i <= Math.min(curx + 1, boardSize - 1); i++) {
+                for (let j = Math.max(0, cury - 1); j <= Math.min(cury + 1, boardSize - 1); j++) {
+                    if (i === curx && j === cury) {
+                        continue;
+                    }
+                    const coords = `(${i}, ${j})`;
+                    if (!visited.has(coords)) {
+                        visited.add(coords);
+                        if (this.board[i][j][0] === "e") {
+                            cellQueue.push(coords);
+                        } 
+                    }
+                }
+            }
+        }
     }
     
     // COMPLETE?

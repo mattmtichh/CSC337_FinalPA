@@ -84,7 +84,7 @@ class MinesweeperGame {
         }
     }
 
-    // TODO
+    // COMPLETE?
     allNums(cellLst) {
         for (let i = 0; i < cellLst.length; i++) {
             if (cellLst[i][0] === "e" || 
@@ -185,8 +185,10 @@ class MinesweeperGame {
             console.log(res);
         }
     } 
+}
 
-    // saveGame(status) { // To be edited
+
+// saveGame(status) { // To be edited
     //     let url = "/app/create/game";
     //     let data = { 'username': currUser , 'difficulty': this.diff, 'time': Date.now(), 'status': status, 'gameboard': board};
     //     let create = fetch(url, {
@@ -207,4 +209,3 @@ class MinesweeperGame {
     //         console.log(error);
     //     });
     // }
-}

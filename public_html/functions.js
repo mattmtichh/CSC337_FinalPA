@@ -76,11 +76,11 @@ function setUser() {
     }
 }
 
-// RENAME TO SAVE GAME?
-function setBoard() {
+// TODO - NEED TO BE ABLE TO SAVE CURRENT GAME STATE
+function saveGame() {
         
     let url = "/app/create/game";
-    let data = { 'username': currUser , 'difficulty': diff, 'time': Date.now(), 'gameboard': board};
+    let data = { 'username': currUser , 'difficulty': theGame.diff, 'time': Date.now(), 'gameboard': theGame.board};
     let create = fetch(url, {
         method: 'POST', 
         body: JSON.stringify(data),
@@ -191,11 +191,6 @@ function goHome() {
     window.location.href = "main.html";
 }
 
-// DELETE? OR MOVE POST LOGIC HERE
-function saveGame() {
-    // post game to be played later 
-}
-
 function printBoardToDOM() {
     if (theGame != null) { // checks for game
         let mainDiv = document.getElementById("gameboardDiv"); //gets the main game div
@@ -233,24 +228,9 @@ function printBoardToDOM() {
     }
 }
 
-// const divList = document.querySelectorAll('div'); // Get all div elements
-     // const numCols = 3;                                // Set number of columns in layout
- 
-     // divList.forEach((div, index) => {
-     //     div.addEventListener('left-click', () => {
-     //         const row = Math.floor(index / numCols) + 1; // Calculate row
-     //         const col = (index % numCols) + 1;           // Calculate column
-             
-     //     });
-     //     div.addEventListener('right-click', () => {
-     //         const row = Math.floor(index / numCols) + 1; // Calculate row
-     //         const col = (index % numCols) + 1;           // Calculate column
-             
-     //     });
-     // });
-
+// COMPLETED??? (NEED TO TEST STEP FUNCTION)
 function reveal(row,col) {
-    theGame.board[row][col][2] = false;
+    theGame.makeStep(row,col);
 }
 
 

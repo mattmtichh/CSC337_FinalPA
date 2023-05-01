@@ -15,7 +15,7 @@ var GameSchema = new mongoose.Schema( {
     username: String,
     difficulty: String,
     time: Number,
-    status: Boolean, // true if game is
+    status: String, // WON,LOST,or ONGOING
     gameboard: {
         type: [[[String, Boolean, Boolean]]],
         required: true
@@ -51,7 +51,7 @@ function doesUserHaveSession(user,sessionID) {
     return false;
 }
 
-const SESSION_LENGTH = 30000;
+const SESSION_LENGTH = 1800000;
 
 function cleanUpSessions() {
     let currentTime = Date.now();
@@ -64,7 +64,7 @@ function cleanUpSessions() {
     }
 }
 
-setInterval(cleanUpSessions, 2000);
+setInterval(cleanUpSessions, 20000);
 
 function authenticate(req,res,next) {
     let c = req.cookies;
@@ -83,7 +83,7 @@ app.use(express.static('public_html'));
 app.use(express.json());
 app.use('app/*/',authenticate);
 
-app.post('/app/create/game/', (req, res) => {
+app.post('/app/save/game/', (req, res) => {
 
     let body = req.body;
     let p1 = User.find({username: body.username}).exec();
@@ -115,6 +115,7 @@ app.post('/app/create/game/', (req, res) => {
                 username: req.body.username,
                 difficulty: req.body.difficulty,
                 time: req.body.time,
+                status: req.body.status,
                 gameboard: gb
             });
             game.save();

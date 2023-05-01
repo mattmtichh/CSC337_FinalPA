@@ -6,7 +6,8 @@ class MinesweeperGame {
         this.diff = diff;
         this.status;
         this.size;
-        this.hints = 3;
+        this.hints;
+        this.startTime = new Date().getTime();
 
         if (this.diff === "easy") {
             // The parameter in the Array object was config.rows, 
@@ -14,14 +15,17 @@ class MinesweeperGame {
             this.board = new Array(8);
             this.totalMines = 10;
             this.size = 8;
+            this.hints = 1;
         } else if (this.diff === "medium") {
             this.board = new Array(16);
             this.totalMines = 40;
             this.size = 16;
+            this.hints = 2;
         } else if (this.diff === "hard"){
             this.board = new Array(24);
             this.totalMines = 99;
             this.size = 24;
+            this.hints = 3;
         }
 
         this.generateBoard();
@@ -75,8 +79,8 @@ class MinesweeperGame {
 
     // COMPLETE
     toggleFlag(i, j) {
-        if (this.board[i][j][2] != false) {
-            if (this.board[i][j][1] == false) {
+        if (this.board[i][j][2]) {
+            if (!this.board[i][j][1]) {
                 this.board[i][j][1] = true;
             } else {
                 this.board[i][j][1] = false;
@@ -109,43 +113,64 @@ class MinesweeperGame {
             return;
         }
 
+
         // If the cell is empty, reveal all surrounding cells. This is done using a BFS
         // algorithm. The queue will hold the coordinates of the cells to be checked, and
         // the visited set will hold the coordinates of the cells that have already been
         // visited.
-        let cellQueue = [`(${x}, ${y})`];
-        let boardSize = this.board.length;
-        let visited = new Set();
-        while (cellQueue.length > 0) {
+        let cellQueue = new Array();
+        let coord = [x, y];
+        cellQueue.push(coord);
 
-            const [curx, cury] = cellQueue.shift();
-            let cell = this.board[x][y];
-            cell[2] = false;
+        console.log("x, y, cellQueue:");
+        console.log(x);
+        console.log(y);
+        console.log(cellQueue);
+
+        let boardSize = this.board.length;
+        let visited = new Array();
+        while (cellQueue.length > 0) {
+            console.log("Starting While Loop.");
+            console.log("Before Shift: ");
+            console.log(cellQueue);
+            const [curx, cury] = cellQueue.pop();
+            console.log("cellQueue Shifted: ");
+            console.log(cellQueue);
+            console.log(curx);
+            console.log(cury);
+
+            this.board[curx][cury][2] = false;
 
             // This double loop will check the 8 cells surrounding the current cell, if the cell is 
             // empty, it will be added to the queue to be checked later, if it is a number or bomb,
             // it will be ignored but still marked visited.
             for (let i = Math.max(0, curx - 1); i <= Math.min(curx + 1, boardSize - 1); i++) {
                 for (let j = Math.max(0, cury - 1); j <= Math.min(cury + 1, boardSize - 1); j++) {
-                    if (i === curx && j === cury) {
+                    if (i == curx && j == cury) {
                         continue;
                     }
-                    const coords = `(${i}, ${j})`;
-                    if (!visited.has(coords)) {
-                        visited.add(coords);
-                        if (this.board[i][j][0] === "e") {
+                    const coords = [i, j];
+                    if (visited.includes(coords) == false) {
+                        visited.push(coords);
+                        if (this.board[i][j][0] === "e" && !this.board[i][j][1] && this.board[i][j][2]) {
                             cellQueue.push(coords);
-                        } 
+                        } else if (this.board[i][j][0] !== "e" && this.board[i][j][0] !== "*"){
+                            this.board[i][j][2] = false;
+                        }
                     }
                 }
             }
+            console.log("Visited: "); 
+            console.log(visited);
+            console.log("Cell Queue: ");
+            console.log(cellQueue);
         }
     }
     
     // COMPLETE?
     isGameOver() {
-        let numBombs;
-        let numHiddenSpaces;
+        let numBombs = 0;
+        let numHiddenSpaces = 0;
         for (let i=0; i<this.board.length; i++) {
             let row = this.board[i];
             for (let j=0; j<row.length; j++) {
@@ -185,27 +210,30 @@ class MinesweeperGame {
             console.log(res);
         }
     } 
+
+    saveGame(user) { // To be edited
+        let endTime = new Date().getTime();
+        let totalTime =  (endTime - this.startTime) / 1000;
+        console.log(this.status);
+        console.log(totalTime);
+        let url = "/app/save/game";
+        let data = { 'username': user , 'difficulty': this.diff, 'time': totalTime, 'status': this.status, 'gameboard': this.board};
+        let create = fetch(url, {
+            method: 'POST', 
+            body: JSON.stringify(data),
+            headers: {"Content-Type": "application/json"}
+        });
+        create.then((response) => { // adds listing to user schema and reroutes to home page
+            response.text().then((message) => {
+                if (message === "Success") {
+                    alert("Game saved successfully. Taking you back to main page.");
+                } else {
+                    alert("Something went wrong.");
+                }
+            });
+        }); 
+        create.catch((error) => {
+            console.log(error);
+        });
+    }
 }
-
-
-// saveGame(status) { // To be edited
-    //     let url = "/app/create/game";
-    //     let data = { 'username': currUser , 'difficulty': this.diff, 'time': Date.now(), 'status': status, 'gameboard': board};
-    //     let create = fetch(url, {
-    //         method: 'POST', 
-    //         body: JSON.stringify(data),
-    //         headers: {"Content-Type": "application/json"}
-    //     });
-    //     create.then((response) => { // adds listing to user schema and reroutes to home page
-    //         response.text().then((message) => {
-    //             if (message === "Success") {
-    //                 window.location.href = "game.html";
-    //             } else {
-    //                 alert("Something went wrong.");
-    //             }
-    //         });
-    //     });
-    //     create.catch((error) => {
-    //         console.log(error);
-    //     });
-    // }

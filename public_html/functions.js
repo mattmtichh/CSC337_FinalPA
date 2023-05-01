@@ -1,6 +1,7 @@
 
 var currUser = '';
 var theGame;
+var ongoingGame = false;
 
 const STATUS = {
     EMPTY: "empty",
@@ -60,6 +61,7 @@ function createNewGame() {
     let difficulty = document.getElementById('gameDifficulty').value;
     theGame = new MinesweeperGame(difficulty);
     if (theGame != null) {
+        document.getElementById("hintButton").innerText = "Hints: "+theGame.hints;
         printBoardToDOM();
     } else {
         alert("Error in global game creation.");
@@ -79,25 +81,8 @@ function setUser() {
 // TODO - NEED TO BE ABLE TO SAVE CURRENT GAME STATE
 function saveGame() {
         
-    let url = "/app/create/game";
-    let data = { 'username': currUser , 'difficulty': theGame.diff, 'time': Date.now(), 'gameboard': theGame.board};
-    let create = fetch(url, {
-        method: 'POST', 
-        body: JSON.stringify(data),
-        headers: {"Content-Type": "application/json"}
-    });
-    create.then((response) => { // adds listing to user schema and reroutes to home page
-        response.text().then((message) => {
-            if (message === "Success") {
-                window.location.href = "game.html";
-            } else {
-                alert("Something went wrong.");
-            }
-        });
-    });
-    create.catch((error) => {
-        console.log(error);
-    });
+    theGame.saveGame(currUser);
+    window.location.href = "main.html";
     
 }
 
@@ -146,17 +131,19 @@ function setLeaderboard(games) {
     leaderboard.innerHTML = "";
     let topten = [];
     games.forEach((game) => {
-        let toString = [game.username, game.difficulty, game.time];
-        if (topten.length < 10) {
-            topten.push(toString);
-            topten.sort((a,b) => b[2] - a[2]);
-        } else {
-            for (let i = 0; i < topten.length; i++) {
-                if (toString[2] > topten[i][2]) {
-                    topten.push(toString);
-                    topten.sort((a,b) => b[2] - a[2]);
-                    topten.splice(10,1);
-                    break;
+        if (game.status === "WON") {
+            let toString = [game.username, game.difficulty, game.time];
+            if (topten.length < 10) {
+                topten.push(toString);
+                topten.sort((a,b) => a[2] - b[2]);
+            } else {
+                for (let i = 0; i < topten.length; i++) {
+                    if (toString[2] > topten[i][2]) {
+                        topten.push(toString);
+                        topten.sort((a,b) => a[2] - b[2]);
+                        topten.splice(10,1);
+                        break;
+                    }
                 }
             }
         }
@@ -204,16 +191,68 @@ function printBoardToDOM() {
                 let temp = document.createElement("div"); // div for each cell
                 temp.style.display = "inline-block";
                 let cell = document.createElement("button"); // creates a button for each cell
-                
+                cell.classList.add("gameButtons");
                 cell.onclick = (() => {  // assigns onclick function to reveal the cell, need to switch to makeStep() in game.js
-                    reveal(i,j);
-                    printBoardToDOM(); //recurses to reprint the board after cell is revealed
-                    if (theGame.isGameOver()) {
-                        alert(theGame.status);
+                    let togglebutton = document.getElementById("flagToggle");
+                    if (togglebutton.value == "ON") { // flag
+                        theGame.toggleFlag(i,j);
+                        printBoardToDOM(); //recurses to reprint the board after cell is revealed
+                        if (theGame.isGameOver()) {
+                            alert(theGame.status);
+                            saveGame();
+                        }
+                    } else { // not flag
+                        reveal(i,j);
+                        printBoardToDOM(); //recurses to reprint the board after cell is revealed
+                        if (theGame.isGameOver()) {
+                            alert(theGame.status);
+                            saveGame();
+                        }
                     }
                 });
                 if (!box[2]) { // if cell is NOT hidden, sets the button text to the cell value
                     cell.textContent = box[0];
+                    if (!box[1]) { // If cell is not flagged
+                        switch (box[0]) {
+                            case "e":
+                                cell.textContent = " ";
+                                cell.style.backgroundColor = "cyan";
+                                break;
+                            case "1":
+                                cell.style.color = "white";
+                                break;
+                            case "2":
+                                cell.style.color = "yellow";
+                                break;
+                            case "3":
+                                cell.style.color = "green";
+                                break;
+                            case "4":
+                                cell.style.color = "orange";
+                                break;
+                            case "5":
+                                cell.style.color = "pink";
+                                break;
+                            case "6":
+                                cell.style.color = "purple";
+                                break;
+                            case "7":
+                                cell.style.color = "blue";
+                                break;
+                            case "8":
+                                cell.style.color = "red";
+                                break;
+                            case "*":
+                                cell.textContent = " ";
+                                cell.style.backgroundColor = "red";
+                                break;
+                            default:
+                                break;
+                        }
+                    } 
+                } else if (box[1]) {
+                    cell.textContent = " ";
+                    cell.style.backgroundColor = "green";
                 } else {
                     cell.textContent = " ";
                 }
@@ -247,12 +286,36 @@ function giveHint() {
         var col = Math.floor((Math.random() * theGame.size));
 
         // if random selects an empty cell, set that cell to unhidden
-        if (theGame.board[row][col][0] === 'e') {
-            theGame.board[row][col][2] = false;
+        if (theGame.board[row][col][0] === 'e' && theGame.board[row][col][2]) {
+            reveal(row,col);
             theGame.hints--; // subtract from amount of hints
+            document.getElementById("hintButton").innerText = "Hints: "+theGame.hints;
+            printBoardToDOM();
             break;
         }
 
     }
+    }
 }
+
+function checkOngoing() {
+    setUser();
+    let url = '/app/get/games/'+currUser;
+    let p1 = fetch(url);
+    p1.then((response) => {
+        response.json().then((obj) => {
+            let games = obj.games;
+            games.forEach((game) => {
+                if (game.status === "ONGOING") {
+                    ongoingGame = true;
+                    theGame = new MinesweeperGame(game.difficulty);
+                    theGame.board = game.gameboard;
+                    printBoardToDOM();
+                    return;
+                }
+            });
+        }).catch((error) => {
+            alert('An error occurred');
+        });
+    });
 }

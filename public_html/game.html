@@ -7,7 +7,7 @@
         <script src="game.js"></script>
         <script src="functions.js"></script>
     </head>
-    <body>
+    <body onload="checkOngoing()">
         <h1>Minesweeper</h1>
         <div id="gameHeadDiv">
             <select id="gameDifficulty">
@@ -16,7 +16,12 @@
                 <option value="hard">Hard</option>
             </select>
            <button onclick="createNewGame()">Create Game</button>
-           <button onclick="saveGame()">Save Game</button>
+           <button id="hintButton" onclick="giveHint()">Hints: 0</button>
+           <select id="flagToggle">
+                <option value="OFF">OFF</option>
+                <option value="ON">ON</option>
+            </select>
+           <!-- <button onclick="saveGame()">Save Game</button> -->
         </div>
         <div id="gameboardDiv">
 

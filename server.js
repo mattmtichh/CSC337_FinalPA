@@ -1,3 +1,9 @@
+/**
+ * server.js
+ * Author: Jon Khong, Carson Chapman, Matt Mitchelson
+ * Desc: This javascript file is responsbile for handling all server-side requests. It includes handlers for all requests, creates and cleans up sessions 
+ * and handles logins.
+ */
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 const express = require('express');
@@ -36,6 +42,11 @@ var User = mongoose.model('User', UserSchema);
 // need to change these next functions to work better for the app, just copied from PA 10
 let sessions = [];
 
+/**
+ * This function adds a session for the user, gives them a session id and adds it to the sessions[].
+ * @param {*} user 
+ * @returns 
+ */
 function addSession(user) {
     let sessionID = Math.floor(Math.random() * 100000);
     let sessionStart = Date.now();
@@ -43,6 +54,13 @@ function addSession(user) {
     return sessionID;
 }
 
+/**
+ * This function checks if the user already has a session by searching the sessions[] if the
+ * sessionID exists in there
+ * @param {*} user 
+ * @param {*} sessionID 
+ * @returns 
+ */
 function doesUserHaveSession(user,sessionID) {
     let entry = sessions[user];
     if (entry != undefined) {
@@ -53,6 +71,9 @@ function doesUserHaveSession(user,sessionID) {
 
 const SESSION_LENGTH = 1800000;
 
+/**
+ * This function cleans up the users' sessions after a certain time.
+ */
 function cleanUpSessions() {
     let currentTime = Date.now();
     for (i in sessions) {
@@ -66,6 +87,13 @@ function cleanUpSessions() {
 
 setInterval(cleanUpSessions, 20000);
 
+/**
+ * This function is used to authenticate the user and check if the user has a session ongoing. It logs the user in the cookie.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 function authenticate(req,res,next) {
     let c = req.cookies;
     if (c && c.login) {
@@ -89,9 +117,6 @@ app.post('/app/save/game/', (req, res) => {
     let p1 = User.find({username: body.username}).exec();
     p1.then((results) => {
         if (results.length == 1) {
-
-            // Issue: parsing body leaves board without the string type of its first index
-            // Resolved: only parsed booleans and left string value data stringified
             var gSize = 0;
             if (req.body.difficulty == 'easy') {
                 gSize = 8;
@@ -103,10 +128,8 @@ app.post('/app/save/game/', (req, res) => {
                 gsize = 24;
             }
             gb = req.body.gameboard;
-            //gb = JSON.parse(req.body.gameboard);
-            for (let i = 0; i < gSize; i++) {
+            for (let i = 0; i < gSize; i++) { // parsing booleans of gameboard
                 for (let j = 0; j < gSize; j++) {
-                    //JSON.stringify(gb[i][j][0]);
                     JSON.parse(gb[i][j][1]);
                     JSON.parse(gb[i][j][2]);
                 }
@@ -134,7 +157,7 @@ app.post('/app/save/game/', (req, res) => {
     })
 });
 
-app.get('/get/game/:user', (req,res) => { // May not need this 
+app.get('/get/game/:user', (req,res) => { 
     let u = req.params.user;
     let p1 = User.find({username:u}).exec();
     p1.then((results) => {
@@ -149,9 +172,6 @@ app.get('/get/game/:user', (req,res) => { // May not need this
 })
 
 app.get('/app/get/games/:user', (req, res) => {
-
-    // TODO - Implement logic to get all games for a user (Will have to change /app/ path to what 
-    // the authenticate function is using).
     let u = req.params.user;
     let p1 = User.find({username:u}).exec();
     p1.then((results) => {
@@ -166,20 +186,11 @@ app.get('/app/get/games/:user', (req, res) => {
 });
 
 app.get('/get/games', (req, res) => {
-
-    // TODO - Implement logic to get all games (Leaderboards can be accessed by anyone?)
-
     let p1 = Games.find().exec();
     p1.then((results) => {
         res.send(results);
     });
     p1.catch((error) => {console.log(error);});
-});
-
-app.get('/get/users', (req, res) => {
-
-    // TODO - Implement logic to get all users (User list can be accessed by anyone?)
-
 });
 
 app.get('/find/user/:username/:password', (req,res) => { //checks login is good and registered
@@ -212,7 +223,6 @@ app.get('/find/user/:username/:password', (req,res) => { //checks login is good 
 });
 
 app.post('/create/user', (req, res) => {
-    // TODO - Implement logic to create a new user (Stored in request body?)
     let body = req.body;
     let p1 = User.find({username: body.username}).exec();
     p1.then((results) => {
@@ -226,7 +236,6 @@ app.post('/create/user', (req, res) => {
             let data = hash.update(toHash, 'utf-8');
             let newHash = data.digest('hex');
 
-            //let newUser = new User(body);
             newUser = new User({
                 username: body.username,
                 password: body.password,
@@ -245,22 +254,6 @@ app.post('/create/user', (req, res) => {
     })
     p1.catch((error) => {res.status(500).send('Internal server error')});
 });
-
-app.post('/app/step/:user', (req, res) => {
-
-    // TODO - Implement logic to step through a game (Will have to change /app/ path to what 
-    // the authenticate function is using).
-
-
-});
-
-app.post('/app/flag/:user', (req, res) => {
-
-    // TODO - Implement logic to flag a space (Will have to change /app/ path to what 
-    // the authenticate function is using).
-
-});
-
 
 const port = 5000;
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));

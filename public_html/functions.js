@@ -1,4 +1,9 @@
-
+/**
+ * functions.js
+ * Authors: Jon Khong, Carson Chapman, Matt Mitchelson
+ * Desc: This javascript file is responsible for handling all of the client-side requests. This includes creating an account, logging in, viewing
+ * the leaderboard, and playing the game itself.
+ */
 var currUser = '';
 var theGame;
 var ongoingGame = false;
@@ -10,7 +15,10 @@ const STATUS = {
     FLAGGED: "flagged"
 }
 
-// COMPLETED
+/**
+ * This function is responsible for the client request of logging in. It submits the login information and redirects the user
+ * to the next page.
+ */
 function login() {
     let u = document.getElementById("existingUser").value;
     let p = document.getElementById("existingPassword").value;
@@ -33,7 +41,10 @@ function login() {
     document.getElementById("existingPassword").value = '';
 }
 
-// COMPLETED
+/**
+ * This function is responsible for handling account creation. It takes the users info from the textboxes and sends it to the server, 
+ * storing it in MongoDB.
+ */
 function createAccount() { 
     let u = document.getElementById("newUser").value;
     let p = document.getElementById("newPassword").value;
@@ -55,7 +66,9 @@ function createAccount() {
     document.getElementById("newPassword").value = '';
 }
 
-// TODO
+/**
+ * This function creates a new game. It creates a new instance of the MinesweeperGame class from game.js.
+ */
 function createNewGame() {
     setUser();
     let difficulty = document.getElementById('gameDifficulty').value;
@@ -69,7 +82,9 @@ function createNewGame() {
     
 }
 
-// COMPLETED
+/**
+ * This function sets the user by using the cookie to grab the username.
+ */
 function setUser() {
     currUser = document.cookie.split('%22')[3]; //this separates the username from the cookie and assigns it to currUser
     if (currUser == undefined) { //checks if cookie has expired
@@ -78,7 +93,9 @@ function setUser() {
     }
 }
 
-// TODO - NEED TO BE ABLE TO SAVE CURRENT GAME STATE
+/**
+ * This function saves the users' games and redirects them back to the main page.
+ */
 function saveGame() {
         
     theGame.saveGame(currUser);
@@ -86,17 +103,23 @@ function saveGame() {
     
 }
 
-// COMPLETED
+/**
+ * This function redirects the window to the game page.
+ */
 function goToGame() {
     window.location.href = "game.html";
 }
 
-// COMPLETED
+/**
+ * This function redirects the window to the leaderboard.
+ */
 function goToLeaderboard() {
     window.location.href = "leaderboard.html";
 }
 
-// COMPLETED
+/**
+ * This function gets the stats of the current user. 
+ */
 function getMyStats() {
     setUser();
     let url = '/app/get/games/'+currUser;
@@ -111,7 +134,9 @@ function getMyStats() {
     });
 }
 
-
+/**
+ * This function gets all the games.
+ */
 function getGlobal() {
     setUser();
     let url = '/get/games/';
@@ -126,6 +151,10 @@ function getGlobal() {
 }
 
 // Might need to change with updated schema, TBD
+/**
+ * THis function sets the leaderboards by recording each games' status.
+ * @param {*} games 
+ */
 function setLeaderboard(games) {
     let leaderboard = document.getElementById("leaderboardDiv");
     leaderboard.innerHTML = "";
@@ -173,11 +202,18 @@ function setLeaderboard(games) {
 }
 
 // COMPLETED
+/**
+ * This function redirects to the home page.
+ */
 function goHome() {
     setUser();
     window.location.href = "main.html";
 }
 
+/**
+ * This function prints the board to DOM. It is responsible for creating the visual side of the board and the game buttons.
+ * It determines whether not a player is flagging or selecting and sets the revealed cells' style.
+ */
 function printBoardToDOM() {
     if (theGame != null) { // checks for game
         let mainDiv = document.getElementById("gameboardDiv"); //gets the main game div
@@ -267,16 +303,21 @@ function printBoardToDOM() {
     }
 }
 
-// COMPLETED??? (NEED TO TEST STEP FUNCTION)
+/**
+ * This function reveals a cell on the game board, it uses the makeStep function to do this.
+ * @param {*} row 
+ * @param {*} col 
+ */
 function reveal(row,col) {
     theGame.makeStep(row,col);
 }
 
 
-// Hint button, loop with random rows and col on board for a spot that hasn't been selected and isn't a bomb
-// [2] true to false
-// TODO: make action to reveal the cell based on the onclick of the hint button,
-// set limit on amount of hints used in a game. - make hints a number field in game schema and check it when hint button is clicked? 
+/**
+ * This function implements the hint feature. It gives the user a free safe pick on the board but is limited to 
+ * a certain amount of hints per game and the amount is also dependent on game difficulty. It uses random to get a row and col and then uses reveal to 
+ * achieve this.
+ */
 function giveHint() {   
     if (theGame.hints == 0) { // if out of hints
         alert("Out of hints.");
@@ -298,6 +339,9 @@ function giveHint() {
     }
 }
 
+/**
+ * This function checks if the ongoing games for the current user by searching through their games and each games' status.
+ */
 function checkOngoing() {
     setUser();
     let url = '/app/get/games/'+currUser;

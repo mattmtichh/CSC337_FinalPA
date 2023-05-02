@@ -1,3 +1,10 @@
+/**
+ * game.js
+ * Author: Jon Khong, Carson Chapman, Matt Mitchelson
+ * Desc: This javascript file is responsible for handling the games' functionality. It is essentially the game itself. 
+ * It handles all the requests of generating the board, checks if the game is over, makes the steps (select logic), 
+ * toggles flag, saves the game and prints the board to console.
+ */
 class MinesweeperGame {
     
     constructor(diff) {
@@ -32,7 +39,6 @@ class MinesweeperGame {
         this.printBoardToConsole();
     }
 
-    // COMPLETE
     generateBoard() {
         if (this.board != undefined) {
             let boardSize = this.board.length;
@@ -77,7 +83,6 @@ class MinesweeperGame {
         }
     }
 
-    // COMPLETE
     toggleFlag(i, j) {
         if (this.board[i][j][2]) {
             if (!this.board[i][j][1]) {
@@ -88,7 +93,6 @@ class MinesweeperGame {
         }
     }
 
-    // COMPLETE?
     allNums(cellLst) {
         for (let i = 0; i < cellLst.length; i++) {
             if (cellLst[i][0] === "e" || 
@@ -99,7 +103,12 @@ class MinesweeperGame {
         return true;
     }
 
-    // POSSIBLY COMPLETE (NEED TO TEST BFS)
+    /**
+     * Makes step logic using BFS, checking all adjacent cells of selected cells and those adjacent cells' adjacent cells.
+     * @param {*} x 
+     * @param {*} y 
+     * @returns 
+     */
     makeStep(x, y) {
         
         // If the cell is flagged, do nothing
@@ -167,7 +176,6 @@ class MinesweeperGame {
         }
     }
     
-    // COMPLETE?
     isGameOver() {
         let numBombs = 0;
         let numHiddenSpaces = 0;
@@ -197,7 +205,6 @@ class MinesweeperGame {
         }
     }
 
-    // COMPLETE
     printBoardToConsole() {
         for (let i=0; i<this.board.length; i++) {
             let row = this.board[i];
@@ -211,7 +218,7 @@ class MinesweeperGame {
         }
     } 
 
-    saveGame(user) { // To be edited
+    saveGame(user) { 
         let endTime = new Date().getTime();
         let totalTime =  (endTime - this.startTime) / 1000;
         console.log(this.status);

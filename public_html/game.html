@@ -10,18 +10,23 @@
     <body onload="checkOngoing()">
         <h1>Minesweeper</h1>
         <div id="gameHeadDiv">
-            <select id="gameDifficulty">
+            <button id="homeButton" onclick="goHome()">Home</button>
+            <select id="gameDifficulty" class = "dropdown">
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
             </select>
            <button onclick="createNewGame()">Create Game</button>
            <button id="hintButton" onclick="giveHint()">Hints: 0</button>
-           <select id="flagToggle">
-                <option value="OFF">OFF</option>
-                <option value="ON">ON</option>
-            </select>
-           <!-- <button onclick="saveGame()">Save Game</button> -->
+           <div id="toggleFlag">
+                <label id="flagLabel">FLAG (0): </label>
+                <select id="flagToggle" class="dropdown">
+                    <option value="OFF">OFF</option>
+                    <option value="ON">ON</option>
+                </select>
+           </div>
+           
+            
         </div>
         <div id="gameboardDiv">
 

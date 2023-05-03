@@ -17,13 +17,19 @@ mongoose.connection.on('error', () => {
     console.log('There was a problem connecting to mongoDB');
 });
 
+var BoardSchema = new mongoose.Schema({
+    type: [[[String, Boolean, Boolean]]],
+});
+
+var Boards = mongoose.model('GameBoards', BoardSchema);
+
 var GameSchema = new mongoose.Schema( {
     username: String,
     difficulty: String,
     time: Number,
     status: String, // WON,LOST,or ONGOING
     gameboard: {
-        type: [[[String, Boolean, Boolean]]],
+        type: BoardSchema,
         required: true
     }
 })
@@ -69,7 +75,7 @@ function doesUserHaveSession(user,sessionID) {
     return false;
 }
 
-const SESSION_LENGTH = 1800000;
+const SESSION_LENGTH = 3000000;
 
 /**
  * This function cleans up the users' sessions after a certain time.
@@ -85,7 +91,7 @@ function cleanUpSessions() {
     }
 }
 
-setInterval(cleanUpSessions, 20000);
+setInterval(cleanUpSessions, 2000);
 
 /**
  * This function is used to authenticate the user and check if the user has a session ongoing. It logs the user in the cookie.
@@ -134,12 +140,15 @@ app.post('/app/save/game/', (req, res) => {
                     JSON.parse(gb[i][j][2]);
                 }
             }
+            const board = new Boards({
+                type: gb
+            })
             const game = new Games({
                 username: req.body.username,
                 difficulty: req.body.difficulty,
                 time: req.body.time,
                 status: req.body.status,
-                gameboard: gb
+                gameboard: board
             });
             game.save();
             let user = results[0];
@@ -206,8 +215,9 @@ app.get('/find/user/:username/:password', (req,res) => { //checks login is good 
             let newHash = data.digest('hex');
 
             if (newHash === results[0].hash) { // if successful match
+                // sessions = [];
                 let id = addSession(u); //adds cookie session
-                res.cookie('login', {username:u,sid: id}, {maxAge:30000});
+                res.cookie('login', {username:u,sid: id}, {maxAge:3000000});
                 res.send('login success');
             } else {
                 res.send('login failed');
@@ -255,5 +265,5 @@ app.post('/create/user', (req, res) => {
     p1.catch((error) => {res.status(500).send('Internal server error')});
 });
 
-const port = 5000;
+const port = 3000;
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));

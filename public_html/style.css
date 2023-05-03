@@ -21,6 +21,10 @@ body {
     background-color: rgb(0, 115, 208);
 }
 
+#homeButton {
+    margin-right: 100px;
+}
+
 .subDiv {
     padding: 5%;
     display: block;
@@ -41,7 +45,9 @@ h1 {
     font-size: 50px;
 }
 
-#gameDifficulty {
+
+
+.dropdown {
     font-size: 20px;
     background-color: rgb(0, 90, 163);
     color: rgb(255, 255, 255);
@@ -50,7 +56,6 @@ h1 {
     border-width: 5px;
     border-color: rgb(255, 255, 255);
     border-radius: 10px;
-    margin-left: 50px;
     padding: 10px;
 
 }
@@ -98,7 +103,14 @@ button:hover {
     padding: 30px;
 }
 
-#myStatsButton {
+#helpButton {
+    position: fixed;
+    top: 5%;
+    right: 5%;
+    left:auto;
+}
+
+/* #myStatsButton {
     position: fixed;
     left: 30%;
     right: auto;
@@ -108,16 +120,21 @@ button:hover {
     position: fixed;
     right: 30%;
     left: auto;
-}
+} */
 
 #gameHeadDiv {
     position: relative;
     top: 9%;
     right: 7%;
     bottom: auto;
-    left: auto;
+    left: 0;
 }
 
 #gameboardDiv {
     position: absolute;
+}
+
+#toggleFlag {
+    margin-left: 50px;
+    display: inline-block;
 }

@@ -10,10 +10,12 @@ class MinesweeperGame {
     constructor(diff) {
         this.board;
         this.totalMines;
+        this.flags;
         this.diff = diff;
         this.status;
         this.size;
         this.hints;
+        this.empties;
         this.startTime = new Date().getTime();
 
         if (this.diff === "easy") {
@@ -23,16 +25,19 @@ class MinesweeperGame {
             this.totalMines = 10;
             this.size = 8;
             this.hints = 1;
+            this.flags = 10;
         } else if (this.diff === "medium") {
             this.board = new Array(16);
             this.totalMines = 40;
             this.size = 16;
             this.hints = 2;
+            this.flags = 40;
         } else if (this.diff === "hard"){
             this.board = new Array(24);
             this.totalMines = 99;
             this.size = 24;
             this.hints = 3;
+            this.flags = 99;
         }
 
         this.generateBoard();
@@ -40,6 +45,7 @@ class MinesweeperGame {
     }
 
     generateBoard() {
+        this.empties = 0;
         if (this.board != undefined) {
             let boardSize = this.board.length;
             for (let i = 0; i < boardSize; i++) {
@@ -73,6 +79,7 @@ class MinesweeperGame {
                         if (this.board[i][j][0] === 'e') {
                             if (numBombs === 0) {
                                 this.board[i][j][0] = 'e';
+                                this.empties += 1;
                             } else {
                                 this.board[i][j][0] = String(numBombs);
                             }
@@ -87,8 +94,10 @@ class MinesweeperGame {
         if (this.board[i][j][2]) {
             if (!this.board[i][j][1]) {
                 this.board[i][j][1] = true;
+                this.flags -= 1;
             } else {
                 this.board[i][j][1] = false;
+                this.flags += 1;
             }
         }
     }
@@ -110,18 +119,23 @@ class MinesweeperGame {
      * @returns 
      */
     makeStep(x, y) {
+
+        console.log("a");
         
         // If the cell is flagged, do nothing
         if (this.board[x][y][1] === true) {
+            console.log("b");
             return;
         }
 
         // If the cell is a number or bomb, reveal tile
         if (this.board[x][y][0] !== "e") {
             this.board[x][y][2] = false;
+            console.log("C");
             return;
         }
 
+        console.log("d");
 
         // If the cell is empty, reveal all surrounding cells. This is done using a BFS
         // algorithm. The queue will hold the coordinates of the cells to be checked, and
@@ -131,22 +145,24 @@ class MinesweeperGame {
         let coord = [x, y];
         cellQueue.push(coord);
 
-        console.log("x, y, cellQueue:");
-        console.log(x);
-        console.log(y);
-        console.log(cellQueue);
+        // console.log("x, y, cellQueue:");
+        // console.log(x);
+        // console.log(y);
+        // console.log(cellQueue);
 
         let boardSize = this.board.length;
         let visited = new Array();
         while (cellQueue.length > 0) {
-            console.log("Starting While Loop.");
-            console.log("Before Shift: ");
-            console.log(cellQueue);
+            // console.log("Starting While Loop.");
+            // console.log("Before Shift: ");
+            // console.log(cellQueue);
             const [curx, cury] = cellQueue.pop();
-            console.log("cellQueue Shifted: ");
-            console.log(cellQueue);
-            console.log(curx);
-            console.log(cury);
+            // console.log("cellQueue Shifted: ");
+            // console.log(cellQueue);
+            // console.log(curx);
+            // console.log(cury);
+
+
 
             this.board[curx][cury][2] = false;
 
@@ -169,10 +185,10 @@ class MinesweeperGame {
                     }
                 }
             }
-            console.log("Visited: "); 
-            console.log(visited);
-            console.log("Cell Queue: ");
-            console.log(cellQueue);
+            // console.log("Visited: "); 
+            // console.log(visited);
+            // console.log("Cell Queue: ");
+            // console.log(cellQueue);
         }
     }
     
@@ -217,6 +233,23 @@ class MinesweeperGame {
             console.log(res);
         }
     } 
+
+    checkEmpties() {
+        let check = 0;
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j][0] === 'e' && this.board[i][j][2] == false) {
+                    check += 1;
+                    console.log(check);
+                }
+            }
+        }
+        if (check < this.empties) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     saveGame(user) { 
         let endTime = new Date().getTime();

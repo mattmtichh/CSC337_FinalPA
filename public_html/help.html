@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Minesweeper</title>
+        <link id="cssFile" rel="stylesheet" type="text/css" href="style.css">
+        <script src="functions.js"></script>
+    </head>
+    <body>
+        <h1>Help Page</h1>
+        <button onclick="goHome()">Home</button>
+        <h3>
+            Minesweeper is a single-player game that begins with a board of tiles with hidden values. Each tile conatins one of the following
+             values: a bomb, a numeric value representing the amount of bombs in the surrounding area, or an empty space. The tiles will be
+             revealed on-click by the user. The goal of the user is to reveal all tiles on the board except for the bombs. If the user is able
+             to successfully do this, the game will be won. However, if a bomb is clicked, the game is lost and will end immediately.
+             Optionally, the user may plant flags on specific tiles that they believe to be bombs. This will help keep track of the number of
+             bombs left on the board and avoid any misclicks.
+        </h3>
+        <h3>
+            In our version of Minesweeper, the user starts at the account creation & login page. Once the user successfully creates an account
+             and is able to log in with the same credetials, they will be taken to the homepage. From there, the user can start a new game or 
+             view the leaderboards. 
+        </h3>
+        <h3>
+            On the game page, the user is able to create a new game by clicking the corresponding button and a difficulty of his or her choosing.
+            Then, a gameboard will be generated and will vary in size based on difficulty and the user may begin to play the game as described above.
+            The user has the option to use hints to reveal a chunk of empty space at random. Once the game is won or lost, it will be saved under
+            the user and the user will be taken back to the homepage.
+        </h3>
+        <h3>
+            The leaderboard page is designed to organize top ten fastest winning games based on difficulty. The user can decide to
+            view their own top scores or view the global leaderboard. *Time is recorded in seconds.*
+        </h3>
+    </body>
+</html>

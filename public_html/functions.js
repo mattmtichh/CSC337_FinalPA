@@ -88,7 +88,7 @@ function createNewGame() {
 function setUser() {
     currUser = document.cookie.split('%22')[3]; //this separates the username from the cookie and assigns it to currUser
     if (currUser == undefined) { //checks if cookie has expired
-        alert('User session expired. Please log back in.')
+        alert('User session expired. Please log back in.');
         window.location.href = 'index.html';
     }
 }
@@ -107,6 +107,7 @@ function saveGame() {
  * This function redirects the window to the game page.
  */
 function goToGame() {
+    setUser();
     window.location.href = "game.html";
 }
 
@@ -114,7 +115,13 @@ function goToGame() {
  * This function redirects the window to the leaderboard.
  */
 function goToLeaderboard() {
+    setUser();
     window.location.href = "leaderboard.html";
+}
+
+function goToHelpPage() {
+    setUser();
+    window.location.href = "help.html";
 }
 
 /**
@@ -157,10 +164,12 @@ function getGlobal() {
  */
 function setLeaderboard(games) {
     let leaderboard = document.getElementById("leaderboardDiv");
+    let difficulty = document.getElementById("leadDifficulty").value;
+    console.log(difficulty);
     leaderboard.innerHTML = "";
     let topten = [];
     games.forEach((game) => {
-        if (game.status === "WON") {
+        if (game.status === "WON" && game.difficulty === difficulty) {
             let toString = [game.username, game.difficulty, game.time];
             if (topten.length < 10) {
                 topten.push(toString);
@@ -218,6 +227,7 @@ function printBoardToDOM() {
     if (theGame != null) { // checks for game
         let mainDiv = document.getElementById("gameboardDiv"); //gets the main game div
         mainDiv.innerHTML = ""; // resets main game div
+        document.getElementById("flagLabel").innerText = "FLAG ("+theGame.flags+"): "
         for (let i = 0; i < theGame.size; i++) { //iterates through rows of the game board
             let row = theGame.board[i];
             let rowDiv = document.createElement("div"); //creates a div for each row
@@ -309,6 +319,7 @@ function printBoardToDOM() {
  * @param {*} col 
  */
 function reveal(row,col) {
+    console.log("see");
     theGame.makeStep(row,col);
 }
 
@@ -322,20 +333,26 @@ function giveHint() {
     if (theGame.hints == 0) { // if out of hints
         alert("Out of hints.");
     } else {
-    while (true) {
-        var row = Math.floor((Math.random() * theGame.size));
-        var col = Math.floor((Math.random() * theGame.size));
-
-        // if random selects an empty cell, set that cell to unhidden
-        if (theGame.board[row][col][0] === 'e' && theGame.board[row][col][2]) {
-            reveal(row,col);
-            theGame.hints--; // subtract from amount of hints
-            document.getElementById("hintButton").innerText = "Hints: "+theGame.hints;
-            printBoardToDOM();
-            break;
+        
+        if (theGame.checkEmpties()) {
+            while (true) {
+                var row = Math.floor((Math.random() * theGame.size));
+                var col = Math.floor((Math.random() * theGame.size));
+        
+                // if random selects an empty cell, set that cell to unhidden
+                if (theGame.board[row][col][0] === 'e' && theGame.board[row][col][2]) {
+                    reveal(row,col);
+                    theGame.hints--; // subtract from amount of hints
+                    document.getElementById("hintButton").innerText = "Hints: "+theGame.hints;
+                    printBoardToDOM();
+                    break;
+                }
+        
+            }
+        } else {
+            alert("all empties revealed");
         }
-
-    }
+    
     }
 }
 
